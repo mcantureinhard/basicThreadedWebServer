@@ -23,14 +23,20 @@ public class SimpleHttpRequest {
         if(pathQuery.hasMoreTokens()){
             query = pathQuery.nextToken();
         }
+        Boolean keepAlive = false;
         while (!(line = reader.readLine()).equals("")){
-            System.out.println(line);
+            StringTokenizer tokenizer = new StringTokenizer(line, ":");
+            if(tokenizer.nextToken().equals("Connection")){
+                if("keep-alive".equals(tokenizer.nextToken().trim())){
+                    keepAlive = true;
+                }
+            }
         }
         return new SimpleHttpRequest(
                 method,
                 path,
                 query,
-                false
+                keepAlive
         );
     }
 
