@@ -113,7 +113,7 @@ public class FileSystemRequestHandler extends RequestHandler {
                         bufferedOutputStream.close();
                     }
                     socket.close();
-                } else {
+                } else if(!socket.isClosed()){
                     // push back to queue if keep-alive
                     socketBlockingQueue.add(socket);
                 }
