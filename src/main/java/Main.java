@@ -22,7 +22,8 @@ public class Main {
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             String error = sw.toString();
-            System.out.println(error);
+            //TODO if we are here due to our LoggingService, we might want to log somehow else
+            LoggingService.getInstance().getLogger().logExceptionMessage(error);
         }
     }
 }
