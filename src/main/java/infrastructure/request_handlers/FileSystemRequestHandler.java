@@ -37,9 +37,11 @@ public class FileSystemRequestHandler extends RequestHandler {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printWriter = new PrintWriter(socket.getOutputStream());
             bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
+            //Parse request (minimal)
             request = SimpleHttpRequest.fromBufferedReader(bufferedReader);
             if(verbose)
-                System.out.println("Handling: " + request.getMethod() + " " + request.getPath() + "?" + request.getQuery());
+                System.out.println("Handling: " + request.getMethod() + " " + request.getPath() + (request.getQuery() != null ? "?" + request.getQuery(): ""));
+            // Handle different requests
             switch (request.getMethod()){
                 case GET:
                     response = get(request);
@@ -48,13 +50,39 @@ public class FileSystemRequestHandler extends RequestHandler {
                     response = notImplemented();
             }
         } catch (SocketTimeoutException e){
+            //We timed out, and close the socket
+            try{
+                if (bufferedReader != null) {
+                    bufferedReader.close();
+                }
+                if (printWriter != null) {
+                    printWriter.close();
+                }
+                if (bufferedOutputStream != null) {
+                    bufferedOutputStream.close();
+                }
+            } catch (Exception innerException){
+                //Probably it is time to move this code to its own place
+                //TODO create function for this
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                innerException.printStackTrace(pw);
+                String error = sw.toString();
+                LoggingService.getInstance().getLogger().logExceptionMessage(error);
+            }
             try {
                 if(verbose)
                     System.out.println("Closing socket due to timeout");
                 socket.close();
             } catch (Exception innerException){
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                innerException.printStackTrace(pw);
+                String error = sw.toString();
+                LoggingService.getInstance().getLogger().logExceptionMessage(error);
             }
         } catch (Exception e) {
+            //Set error response in case of an issue
             response = errorResponse();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -63,7 +91,9 @@ public class FileSystemRequestHandler extends RequestHandler {
             LoggingService.getInstance().getLogger().logExceptionMessage(error);
         } finally {
             try {
+                // Send response
                 sendResponse(response, printWriter, bufferedOutputStream);
+                // Close if not keep alive
                 if(request == null || !request.getKeepAlive()) {
                     if (bufferedReader != null) {
                         bufferedReader.close();
@@ -76,6 +106,7 @@ public class FileSystemRequestHandler extends RequestHandler {
                     }
                     socket.close();
                 } else {
+                    // push back to queue if keep-alive
                     socketBlockingQueue.add(socket);
                 }
             } catch (Exception e){

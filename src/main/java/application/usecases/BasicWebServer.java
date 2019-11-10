@@ -12,6 +12,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 
+
+//We use a subclass of RequestHandler, the reason is to force Runnable which we cannot with an interface
 public class BasicWebServer<T extends RequestHandler> {
     private final Class<T> requestHandlerClass;
     private int port;
@@ -56,6 +58,7 @@ public class BasicWebServer<T extends RequestHandler> {
         if(verbose)
             System.out.println("Started Basic Web Server");
         while (true){
+            //Push accepted sockets into our queue
             Socket socket = serverSocket.accept();
             if(verbose)
                 System.out.println("Accepted socket");
@@ -82,6 +85,7 @@ public class BasicWebServer<T extends RequestHandler> {
                     socket.setSoTimeout(timeout);
                     if(verbose)
                         System.out.println("Got socket from queue");
+                    //Create an instance of our RequestHandler subclass and pass parameters
                     RequestHandler handler = requestHandlerClass.getDeclaredConstructor(new Class[]{Socket.class, BlockingQueue.class, Boolean.class}).newInstance(socket, socketBlockingQueue, verbose);
                     executorService.execute(handler);
                 } catch (Exception e){

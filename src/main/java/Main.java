@@ -13,7 +13,9 @@ import java.util.concurrent.Executors;
 public class Main {
     public static void main(String[] args) {
         try {
+            //Use PrintLogger
             LoggingService.getInstance().init(new PrintLogger());
+            //Read configuration from file
             ApplicationConfiguration.getInstance().init(new FileApplicationConfiguration());
             BasicWebServer basicWebServer = new BasicWebServer(Executors.newCachedThreadPool(), FileSystemRequestHandler.class);
             basicWebServer.run();

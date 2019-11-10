@@ -12,6 +12,7 @@ public class FileApplicationConfiguration implements ApplicationConfigurationInt
     HashMap<String,String> keyValueMap;
     public FileApplicationConfiguration() throws Exception{
         keyValueMap = new HashMap<>();
+        //This will probably be packaged TODO Do not use packaged config file
         InputStream inputStream = FileApplicationConfiguration.class.getResourceAsStream("/config.properties");
         InputStreamReader reader = new InputStreamReader(inputStream);
         BufferedReader bufferedReader = new BufferedReader(reader);
