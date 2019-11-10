@@ -40,6 +40,7 @@ public class BasicWebServer<T extends RequestHandler> {
         threadedQueueConsumerThread.start();
     }
 
+    //Idea taken from Stackoverflow (second reference)
     public BasicWebServer(ExecutorService executorService, Class<T> requestHandlerClass) throws Exception {
         this.executorService = executorService;
         this.requestHandlerClass = requestHandlerClass;

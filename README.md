@@ -26,3 +26,4 @@ The application configuration currently comes from a config file, but we could c
 #### References
     - https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
     - https://stackoverflow.com/questions/23962359/thread-pool-in-a-web-server-in-java
+    - https://stackoverflow.com/questions/43157/easy-way-to-write-contents-of-a-java-inputstream-to-an-outputstream

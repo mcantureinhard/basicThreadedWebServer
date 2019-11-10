@@ -25,6 +25,7 @@ public class FileSystemRequestHandler extends RequestHandler {
         rootDir = ApplicationConfiguration.getInstance().get("fsroot");
     }
 
+    //General idea taken from Create a simple HTTP Web Server in Java
     @Override
     public void run() {
         //TODO implement keep alive, minor change to RequestHandler needed, pass queue so we can return socket to queue rather than close
@@ -147,6 +148,7 @@ public class FileSystemRequestHandler extends RequestHandler {
         return response;
     }
 
+    // Reference for this is Create a simple HTTP Web Server in Java. Listed in README
     private void sendResponse(SimpleHttpResponse response, PrintWriter printWriter, BufferedOutputStream bufferedOutputStream) throws Exception{
         if(response != null) {
             printWriter.println("HTTP/1.1 " + response.getResponseCode().code + " " + response.getResponseCode().message);
@@ -162,6 +164,7 @@ public class FileSystemRequestHandler extends RequestHandler {
         }
     }
 
+    //Reference StackOverflow
     private void writeFileToOutputStream(String file, BufferedOutputStream bufferedOutputStream) throws Exception{
         FileInputStream fileInputStream = new FileInputStream(file);
         BufferedInputStream bufferedInputStream = new BufferedInputStream(fileInputStream);
@@ -173,6 +176,7 @@ public class FileSystemRequestHandler extends RequestHandler {
         bufferedOutputStream.flush();
     }
 
+    //Reference Create a simple HTTP Web Server in Java
     private SimpleHttpResponse.ContentType getContentType(String fileRequested) {
         if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
             return SimpleHttpResponse.ContentType.TEXTHTML;
