@@ -1,7 +1,11 @@
+import application.ApplicationConfiguration;
 import application.services.RequestHandler;
 import application.usecases.BasicWebServer;
+import infrastructure.application_configuration.FileApplicationConfiguration;
 import infrastructure.request_handlers.FileSystemRequestHandler;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.Socket;
 import java.net.ServerSocket;
 import java.util.concurrent.Executors;
@@ -10,10 +14,15 @@ import java.util.concurrent.Executors;
 public class Main {
     public static void main(String[] args) {
         try {
+            ApplicationConfiguration.getInstance().init(new FileApplicationConfiguration());
             BasicWebServer basicWebServer = new BasicWebServer(Executors.newCachedThreadPool(), FileSystemRequestHandler.class);
             basicWebServer.run();
         } catch (Exception e){
-
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            String error = sw.toString();
+            System.out.println(error);
         }
     }
 }

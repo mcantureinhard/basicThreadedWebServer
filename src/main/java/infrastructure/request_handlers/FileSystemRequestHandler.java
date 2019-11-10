@@ -1,5 +1,6 @@
 package infrastructure.request_handlers;
 
+import application.ApplicationConfiguration;
 import application.services.RequestHandler;
 import domain.models.SimpleHttpRequest;
 import domain.models.SimpleHttpResponse;
@@ -10,10 +11,9 @@ import java.util.Date;
 import java.util.StringTokenizer;
 
 public class FileSystemRequestHandler extends RequestHandler {
-    private final String NOT_SUPPORTED = "/html/unsupported.html";
     //TODO Use configuration
-    private final String rootDir = "/var/www";
-    static final File ROOT = new File("/var/www");
+    private final String rootDir = ApplicationConfiguration.getInstance().get("fsroot");
+    static final File ROOT = new File(ApplicationConfiguration.getInstance().get("fsroot"));
     public FileSystemRequestHandler(Socket socket) {
         super(socket);
     }
