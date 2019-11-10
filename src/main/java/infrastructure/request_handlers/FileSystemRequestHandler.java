@@ -12,8 +12,8 @@ import java.util.StringTokenizer;
 public class FileSystemRequestHandler extends RequestHandler {
     private final String NOT_SUPPORTED = "/html/unsupported.html";
     //TODO Use configuration
-    private final String rootDir = "/tmp/test/";
-    static final File ROOT = new File("/tmp/test");
+    private final String rootDir = "/var/www";
+    static final File ROOT = new File("/var/www");
     public FileSystemRequestHandler(Socket socket) {
         super(socket);
     }
