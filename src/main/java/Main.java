@@ -1,6 +1,5 @@
-import application.ApplicationConfiguration;
+import application.services.ApplicationConfiguration;
 import application.services.LoggingService;
-import application.services.RequestHandler;
 import application.usecases.BasicWebServer;
 import infrastructure.application_configuration.FileApplicationConfiguration;
 import infrastructure.logging.PrintLogger;
@@ -8,8 +7,6 @@ import infrastructure.request_handlers.FileSystemRequestHandler;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.Socket;
-import java.net.ServerSocket;
 import java.util.concurrent.Executors;
 
 

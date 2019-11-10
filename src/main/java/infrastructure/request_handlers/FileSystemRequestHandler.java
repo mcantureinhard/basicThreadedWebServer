@@ -1,6 +1,6 @@
 package infrastructure.request_handlers;
 
-import application.ApplicationConfiguration;
+import application.services.ApplicationConfiguration;
 import application.services.LoggingService;
 import application.services.RequestHandler;
 import domain.models.SimpleHttpRequest;
@@ -8,10 +8,8 @@ import domain.models.SimpleHttpResponse;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.util.Date;
-import java.util.StringTokenizer;
 import java.util.concurrent.BlockingQueue;
 
 public class FileSystemRequestHandler extends RequestHandler {

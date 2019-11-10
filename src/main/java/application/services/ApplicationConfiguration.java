@@ -1,7 +1,6 @@
-package application;
+package application.services;
 
 import application.interfaces.ApplicationConfigurationInterface;
-import application.services.LoggingService;
 
 public class ApplicationConfiguration {
     private static ApplicationConfiguration instance;

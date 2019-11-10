@@ -1,13 +1,11 @@
 package application.usecases;
 
-import application.ApplicationConfiguration;
+import application.services.ApplicationConfiguration;
 import application.services.LoggingService;
 import application.services.RequestHandler;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
