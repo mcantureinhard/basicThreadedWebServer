@@ -23,10 +23,14 @@ public class BasicWebServer<T extends RequestHandler> {
     private ServerSocket serverSocket;
     private Thread threadedQueueConsumerThread;
     private int timeout = 5000;
+    private boolean verbose = false;
 
     private void init() throws IOException {
         if(ApplicationConfiguration.getInstance().get("timeout") != null){
             timeout = Integer.parseInt(ApplicationConfiguration.getInstance().get("timeout"));
+        }
+        if(ApplicationConfiguration.getInstance().get("verbose") != null){
+            verbose = Boolean.parseBoolean(ApplicationConfiguration.getInstance().get("verbose"));
         }
         serverSocket = new ServerSocket(port);
         socketBlockingQueue = new ArrayBlockingQueue<>(maxQueueSize);
@@ -52,10 +56,12 @@ public class BasicWebServer<T extends RequestHandler> {
     }
 
     public void run() throws Exception {
-        System.out.println("Started Basic Web Server");
+        if(verbose)
+            System.out.println("Started Basic Web Server");
         while (true){
             Socket socket = serverSocket.accept();
-            System.out.println("Accepted socket");
+            if(verbose)
+                System.out.println("Accepted socket");
             socketBlockingQueue.add(socket);
         }
     }
@@ -77,8 +83,9 @@ public class BasicWebServer<T extends RequestHandler> {
                 try {
                     Socket socket = socketBlockingQueue.take();
                     socket.setSoTimeout(timeout);
-                    System.out.println("Got socket from queue");
-                    RequestHandler handler = requestHandlerClass.getDeclaredConstructor(new Class[]{Socket.class, BlockingQueue.class}).newInstance(socket, socketBlockingQueue);
+                    if(verbose)
+                        System.out.println("Got socket from queue");
+                    RequestHandler handler = requestHandlerClass.getDeclaredConstructor(new Class[]{Socket.class, BlockingQueue.class, Boolean.class}).newInstance(socket, socketBlockingQueue, verbose);
                     executorService.execute(handler);
                 } catch (Exception e){
                     StringWriter sw = new StringWriter();

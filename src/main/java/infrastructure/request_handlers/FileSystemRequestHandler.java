@@ -20,6 +20,10 @@ public class FileSystemRequestHandler extends RequestHandler {
         super(socket, socketBlockingQueue);
     }
 
+    public FileSystemRequestHandler(Socket socket, BlockingQueue<Socket> socketBlockingQueue, Boolean verbose){
+        super(socket, socketBlockingQueue, verbose);
+    }
+
     @Override
     public void run() {
         //TODO implement keep alive, minor change to RequestHandler needed, pass queue so we can return socket to queue rather than close
@@ -28,20 +32,26 @@ public class FileSystemRequestHandler extends RequestHandler {
         BufferedOutputStream bufferedOutputStream = null;
         SimpleHttpResponse response = null;
         SimpleHttpRequest request = null;
-        String line = null;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printWriter = new PrintWriter(socket.getOutputStream());
             bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
             request = SimpleHttpRequest.fromBufferedReader(bufferedReader);
-
+            if(verbose)
+                System.out.println("Handling: " + request.getMethod() + " " + request.getPath() + "?" + request.getQuery());
             switch (request.getMethod()){
                 case GET:
                     response = get(request);
                     break;
                 default:
-                    System.out.println("Not implemented");
                     response = notImplemented();
+            }
+        } catch (SocketTimeoutException e){
+            try {
+                if(verbose)
+                    System.out.println("Closing socket due to timeout");
+                socket.close();
+            } catch (Exception innerException){
             }
         } catch (Exception e) {
             response = errorResponse();
@@ -65,19 +75,7 @@ public class FileSystemRequestHandler extends RequestHandler {
                     }
                     socket.close();
                 } else {
-                    System.out.println(socketBlockingQueue.size());
                     socketBlockingQueue.add(socket);
-                    System.out.println(socketBlockingQueue.size());
-                }
-            } catch (SocketTimeoutException e){
-                try {
-                    socket.close();
-                } catch (Exception innerException){
-                    StringWriter sw = new StringWriter();
-                    PrintWriter pw = new PrintWriter(sw);
-                    e.printStackTrace(pw);
-                    String error = sw.toString();
-                    System.out.println(error);
                 }
             } catch (Exception e){
                 StringWriter sw = new StringWriter();
