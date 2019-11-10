@@ -24,11 +24,12 @@ public class FileSystemRequestHandler extends RequestHandler {
         PrintWriter printWriter = null;
         BufferedOutputStream bufferedOutputStream = null;
         SimpleHttpResponse response = null;
+        String line = null;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printWriter = new PrintWriter(socket.getOutputStream());
             bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
-            String line = bufferedReader.readLine();
+            line = bufferedReader.readLine();
             if(line == null){
                 return;
             }
@@ -105,15 +106,17 @@ public class FileSystemRequestHandler extends RequestHandler {
     }
 
     private void sendResponse(SimpleHttpResponse response, PrintWriter printWriter, BufferedOutputStream bufferedOutputStream) throws Exception{
-        printWriter.println("HTTP/1.1 " + response.getResponseCode().code + " " + response.getResponseCode().message );
-        printWriter.println("Server: " + response.getServer());
-        printWriter.println("Date: " + new Date());
-        printWriter.println("Content-type: " + response.getContentType().toString());
-        printWriter.println("Content-length: " + response.getFileSize());
-        printWriter.println();
-        printWriter.flush();
-        if(response.getFile() != null){
-            writeFileToOutputStream(response.getFile(), bufferedOutputStream);
+        if(response != null) {
+            printWriter.println("HTTP/1.1 " + response.getResponseCode().code + " " + response.getResponseCode().message);
+            printWriter.println("Server: " + response.getServer());
+            printWriter.println("Date: " + new Date());
+            printWriter.println("Content-type: " + response.getContentType().toString());
+            printWriter.println("Content-length: " + response.getFileSize());
+            printWriter.println();
+            printWriter.flush();
+            if (response.getFile() != null) {
+                writeFileToOutputStream(response.getFile(), bufferedOutputStream);
+            }
         }
     }
 
