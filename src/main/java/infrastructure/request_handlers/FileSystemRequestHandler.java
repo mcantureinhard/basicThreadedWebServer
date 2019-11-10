@@ -1,6 +1,7 @@
 package infrastructure.request_handlers;
 
 import application.services.RequestHandler;
+import domain.models.SimpleHttpRequest;
 import domain.models.SimpleHttpResponse;
 
 import java.io.*;
@@ -29,20 +30,15 @@ public class FileSystemRequestHandler extends RequestHandler {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printWriter = new PrintWriter(socket.getOutputStream());
             bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
-            line = bufferedReader.readLine();
-            if(line == null){
-                return;
-            }
-            System.out.println(line);
-            StringTokenizer stringTokenizer = new StringTokenizer(line);
-            String method = stringTokenizer.nextToken().toUpperCase();
-            switch (method){
-                case "GET":
-                    response = get(stringTokenizer);
+            SimpleHttpRequest request = SimpleHttpRequest.fromBufferedReader(bufferedReader);
+
+            switch (request.getMethod()){
+                case GET:
+                    response = get(request);
                     break;
                 default:
                     System.out.println("Not implemented");
-                    response = notImplemented(stringTokenizer);
+                    response = notImplemented();
             }
         } catch (Exception e) {
             response = errorResponse();
@@ -73,12 +69,8 @@ public class FileSystemRequestHandler extends RequestHandler {
         }
     }
 
-    private SimpleHttpResponse get(StringTokenizer tokenizer) throws Exception {
-        if(!tokenizer.hasMoreTokens()){
-            System.out.println("Empty request");
-            //TODO is this even possible?
-        }
-        String fileName = rootDir + tokenizer.nextToken();
+    private SimpleHttpResponse get(SimpleHttpRequest request) throws Exception {
+        String fileName = rootDir + request.getPath();
         File file = new File(fileName);
         if(!file.exists()){
             return notFoundResponse();
@@ -95,7 +87,7 @@ public class FileSystemRequestHandler extends RequestHandler {
         return response;
     }
 
-    private SimpleHttpResponse notImplemented(StringTokenizer tokenizer) throws Exception {
+    private SimpleHttpResponse notImplemented() throws Exception {
         SimpleHttpResponse response = new SimpleHttpResponse(
                 SimpleHttpResponse.ResponseCode.NOTIMPLEMENTED,
                 SimpleHttpResponse.ContentType.TEXTHTML,
