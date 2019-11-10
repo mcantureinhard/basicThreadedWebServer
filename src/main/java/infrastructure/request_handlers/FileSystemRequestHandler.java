@@ -95,13 +95,9 @@ public class FileSystemRequestHandler extends RequestHandler {
     }
 
     private SimpleHttpResponse notImplemented(StringTokenizer tokenizer) throws Exception {
-        File file = new File(NOT_SUPPORTED);
-        String contentMimeType = "text/html";
-        //read content to return to client
-        int fileLength = (int) file.length();
         SimpleHttpResponse response = new SimpleHttpResponse(
                 SimpleHttpResponse.ResponseCode.NOTIMPLEMENTED,
-                SimpleHttpResponse.ContentType.TEXTPLAIN,
+                SimpleHttpResponse.ContentType.TEXTHTML,
                 null,
                 0
         );
