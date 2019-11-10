@@ -13,7 +13,6 @@ import java.util.StringTokenizer;
 public class FileSystemRequestHandler extends RequestHandler {
     //TODO Use configuration
     private final String rootDir = ApplicationConfiguration.getInstance().get("fsroot");
-    static final File ROOT = new File(ApplicationConfiguration.getInstance().get("fsroot"));
     public FileSystemRequestHandler(Socket socket) {
         super(socket);
     }
