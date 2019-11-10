@@ -40,6 +40,11 @@ public class FileSystemRequestHandler extends RequestHandler {
             bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
             //Parse request (minimal)
             request = SimpleHttpRequest.fromBufferedReader(bufferedReader);
+            if(request == null){
+                if(verbose)
+                    System.out.println("NULL REQUEST");
+                return;
+            }
             if(verbose)
                 System.out.println("Handling: " + request.getMethod() + " " + request.getPath() + (request.getQuery() != null ? "?" + request.getQuery(): ""));
             // Handle different requests
@@ -95,7 +100,9 @@ public class FileSystemRequestHandler extends RequestHandler {
                 // Send response
                 sendResponse(response, printWriter, bufferedOutputStream);
                 // Close if not keep alive
-                if(request == null || !request.getKeepAlive()) {
+                if((request == null || !request.getKeepAlive()) && !socket.isClosed()) {
+                    if(verbose)
+                        System.out.println("Closing Socket");
                     if (bufferedReader != null) {
                         bufferedReader.close();
                     }

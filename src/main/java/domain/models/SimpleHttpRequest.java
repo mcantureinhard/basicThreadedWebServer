@@ -1,5 +1,7 @@
 package domain.models;
 
+import application.services.ApplicationConfiguration;
+
 import java.io.BufferedReader;
 import java.util.StringTokenizer;
 
@@ -12,9 +14,14 @@ public class SimpleHttpRequest {
     private final String path;
     private final String query;
     private final Boolean keepAlive;
+    private final String httpVersion;
 
     public static SimpleHttpRequest fromBufferedReader(BufferedReader reader) throws Exception{
         String line = reader.readLine();
+        if("true".equals(ApplicationConfiguration.getInstance().get("verbose")))
+            System.out.println("Method and path:" + line);
+        if(line == null)
+            return null;
         StringTokenizer stringTokenizer = new StringTokenizer(line);
         Method method = Method.valueOf(stringTokenizer.nextToken().toUpperCase());
         StringTokenizer pathQuery = new StringTokenizer(stringTokenizer.nextToken(), "?");
@@ -23,12 +30,22 @@ public class SimpleHttpRequest {
         if(pathQuery.hasMoreTokens()){
             query = pathQuery.nextToken();
         }
+        String httpVersion = stringTokenizer.nextToken();
         Boolean keepAlive = false;
+        if(!"HTTP/1.1".equals(httpVersion)) {
+            keepAlive = true;
+        }
         while (!(line = reader.readLine()).equals("")){
+            if("true".equals(ApplicationConfiguration.getInstance().get("verbose")))
+                System.out.println(line);
             StringTokenizer tokenizer = new StringTokenizer(line, ":");
+            // Probably I also need to check for HTTP 1.1
             if(tokenizer.nextToken().equals("Connection")){
-                if("keep-alive".equals(tokenizer.nextToken().trim())){
+                String value = tokenizer.nextToken().trim();
+                if("keep-alive".equals(value)){
                     keepAlive = true;
+                } else if("close".equals(value)){
+                    keepAlive = false;
                 }
             }
         }
@@ -36,21 +53,24 @@ public class SimpleHttpRequest {
                 method,
                 path,
                 query,
+                httpVersion,
                 keepAlive
         );
     }
 
-    public SimpleHttpRequest(Method method, String path, String query) {
+    public SimpleHttpRequest(Method method, String path, String query, String httpVersion) {
         this.method = method;
         this.path = path;
         this.query = query;
+        this.httpVersion = httpVersion;
         this.keepAlive = false;
     }
 
-    public SimpleHttpRequest(Method method, String path, String query, Boolean keepAlive) {
+    public SimpleHttpRequest(Method method, String path, String query, String httpVersion, Boolean keepAlive) {
         this.method = method;
         this.path = path;
         this.query = query;
+        this.httpVersion = httpVersion;
         this.keepAlive = keepAlive;
     }
 

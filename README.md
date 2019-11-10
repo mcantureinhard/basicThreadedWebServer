@@ -22,6 +22,10 @@ Both are singletons that receive implementations of their respective interfaces.
 This allows us to use these without passing them around, while still having the benefit of flexible implementations.
 The application configuration currently comes from a config file, but we could call a REST endpoint or a database.
 
+#### Logging
+Exceptions are handled in a broad manner (and simple for now). The idea is to remove complexity about error handling from most of the code.
+We can send off these logs to process and aggregate (Error per unit of time) to be able to quantify the impact and prioritize the fixing of issues.
+
 
 #### References
     - https://medium.com/@ssaurel/create-a-simple-http-web-server-in-java-3fc12b29d5fd
