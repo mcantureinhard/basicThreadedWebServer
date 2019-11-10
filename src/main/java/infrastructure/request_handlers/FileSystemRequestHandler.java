@@ -37,7 +37,6 @@ public class FileSystemRequestHandler extends RequestHandler {
             String method = stringTokenizer.nextToken().toUpperCase();
             switch (method){
                 case "GET":
-                    System.out.println("======== GET ===========");
                     response = get(stringTokenizer);
                     break;
                 default:
@@ -45,6 +44,7 @@ public class FileSystemRequestHandler extends RequestHandler {
                     response = notImplemented(stringTokenizer);
             }
         } catch (Exception e) {
+            response = errorResponse();
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
@@ -79,6 +79,9 @@ public class FileSystemRequestHandler extends RequestHandler {
         }
         String fileName = rootDir + tokenizer.nextToken();
         File file = new File(fileName);
+        if(!file.exists()){
+            return notFoundResponse();
+        }
         int fileSize = (int) file.length();
         SimpleHttpResponse.ContentType contentType = getContentType(fileName);
 
@@ -134,5 +137,25 @@ public class FileSystemRequestHandler extends RequestHandler {
             return SimpleHttpResponse.ContentType.TEXTHTML;
         else
             return SimpleHttpResponse.ContentType.TEXTPLAIN;
+    }
+
+    private SimpleHttpResponse errorResponse(){
+        SimpleHttpResponse response = new SimpleHttpResponse(
+                SimpleHttpResponse.ResponseCode.ERROR,
+                SimpleHttpResponse.ContentType.TEXTPLAIN,
+                null,
+                0
+        );
+        return response;
+    }
+
+    private SimpleHttpResponse notFoundResponse(){
+        SimpleHttpResponse response = new SimpleHttpResponse(
+                SimpleHttpResponse.ResponseCode.NOTFOUND,
+                SimpleHttpResponse.ContentType.TEXTPLAIN,
+                null,
+                0
+        );
+        return response;
     }
 }
