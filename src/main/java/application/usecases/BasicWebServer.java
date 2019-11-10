@@ -38,19 +38,17 @@ public class BasicWebServer<T extends RequestHandler> {
         threadedQueueConsumerThread.start();
     }
 
-    public BasicWebServer(int port, ExecutorService executorService, Class<T> requestHandlerClass, int maxQueueSize) throws Exception {
-        this.port = port;
-        this.executorService = executorService;
-        this.requestHandlerClass = requestHandlerClass;
-        this.maxQueueSize = maxQueueSize;
-        init();
-    }
-
     public BasicWebServer(ExecutorService executorService, Class<T> requestHandlerClass) throws Exception {
         this.executorService = executorService;
         this.requestHandlerClass = requestHandlerClass;
         this.port = 8080;
+        if(ApplicationConfiguration.getInstance().get("port") != null){
+            timeout = Integer.parseInt(ApplicationConfiguration.getInstance().get("port"));
+        }
         this.maxQueueSize = 2048;
+        if(ApplicationConfiguration.getInstance().get("maxQueueSize") != null){
+            timeout = Integer.parseInt(ApplicationConfiguration.getInstance().get("maxQueueSize"));
+        }
         init();
     }
 
