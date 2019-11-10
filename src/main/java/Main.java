@@ -1,7 +1,9 @@
 import application.ApplicationConfiguration;
+import application.services.LoggingService;
 import application.services.RequestHandler;
 import application.usecases.BasicWebServer;
 import infrastructure.application_configuration.FileApplicationConfiguration;
+import infrastructure.logging.PrintLogger;
 import infrastructure.request_handlers.FileSystemRequestHandler;
 
 import java.io.PrintWriter;
@@ -14,6 +16,7 @@ import java.util.concurrent.Executors;
 public class Main {
     public static void main(String[] args) {
         try {
+            LoggingService.getInstance().init(new PrintLogger());
             ApplicationConfiguration.getInstance().init(new FileApplicationConfiguration());
             BasicWebServer basicWebServer = new BasicWebServer(Executors.newCachedThreadPool(), FileSystemRequestHandler.class);
             basicWebServer.run();

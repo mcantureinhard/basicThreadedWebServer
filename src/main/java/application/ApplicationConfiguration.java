@@ -1,6 +1,7 @@
 package application;
 
-import application.services.ApplicationConfigurationInterface;
+import application.interfaces.ApplicationConfigurationInterface;
+import application.services.LoggingService;
 
 public class ApplicationConfiguration {
     private static ApplicationConfiguration instance;
@@ -20,11 +21,9 @@ public class ApplicationConfiguration {
         return instance;
     }
 
-    public String get(String key){
+    public String get(String key) throws Exception {
         if(this.applicationConfigurationInterface == null){
-            System.out.println("Missing application configuration interface");
-            return null;
-        }
+            throw new Exception("Missing application configuration interface");      }
         return this.applicationConfigurationInterface.get(key);
     }
 }

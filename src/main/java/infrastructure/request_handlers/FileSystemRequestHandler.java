@@ -1,6 +1,7 @@
 package infrastructure.request_handlers;
 
 import application.ApplicationConfiguration;
+import application.services.LoggingService;
 import application.services.RequestHandler;
 import domain.models.SimpleHttpRequest;
 import domain.models.SimpleHttpResponse;
@@ -15,13 +16,15 @@ import java.util.concurrent.BlockingQueue;
 
 public class FileSystemRequestHandler extends RequestHandler {
     //TODO Use configuration
-    private final String rootDir = ApplicationConfiguration.getInstance().get("fsroot");
-    public FileSystemRequestHandler(Socket socket, BlockingQueue<Socket> socketBlockingQueue) {
+    private final String rootDir;
+    public FileSystemRequestHandler(Socket socket, BlockingQueue<Socket> socketBlockingQueue) throws Exception{
         super(socket, socketBlockingQueue);
+        rootDir = ApplicationConfiguration.getInstance().get("fsroot");
     }
 
-    public FileSystemRequestHandler(Socket socket, BlockingQueue<Socket> socketBlockingQueue, Boolean verbose){
+    public FileSystemRequestHandler(Socket socket, BlockingQueue<Socket> socketBlockingQueue, Boolean verbose) throws Exception {
         super(socket, socketBlockingQueue, verbose);
+        rootDir = ApplicationConfiguration.getInstance().get("fsroot");
     }
 
     @Override
@@ -59,7 +62,7 @@ public class FileSystemRequestHandler extends RequestHandler {
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
             String error = sw.toString();
-            System.out.println(error);
+            LoggingService.getInstance().getLogger().logExceptionMessage(error);
         } finally {
             try {
                 sendResponse(response, printWriter, bufferedOutputStream);
@@ -82,7 +85,7 @@ public class FileSystemRequestHandler extends RequestHandler {
                 PrintWriter pw = new PrintWriter(sw);
                 e.printStackTrace(pw);
                 String error = sw.toString();
-                System.out.println(error);
+                LoggingService.getInstance().getLogger().logExceptionMessage(error);
             }
         }
     }

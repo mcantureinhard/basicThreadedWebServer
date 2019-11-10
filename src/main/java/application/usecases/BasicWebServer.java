@@ -1,6 +1,7 @@
 package application.usecases;
 
 import application.ApplicationConfiguration;
+import application.services.LoggingService;
 import application.services.RequestHandler;
 
 import java.io.IOException;
@@ -25,7 +26,7 @@ public class BasicWebServer<T extends RequestHandler> {
     private int timeout = 5000;
     private boolean verbose = false;
 
-    private void init() throws IOException {
+    private void init() throws Exception {
         if(ApplicationConfiguration.getInstance().get("timeout") != null){
             timeout = Integer.parseInt(ApplicationConfiguration.getInstance().get("timeout"));
         }
@@ -92,7 +93,7 @@ public class BasicWebServer<T extends RequestHandler> {
                     PrintWriter pw = new PrintWriter(sw);
                     e.printStackTrace(pw);
                     String error = sw.toString();
-                    System.out.println(error);
+                    LoggingService.getInstance().getLogger().logExceptionMessage(error);
                 }
             }
         }

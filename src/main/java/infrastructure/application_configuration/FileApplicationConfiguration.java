@@ -1,6 +1,6 @@
 package infrastructure.application_configuration;
 
-import application.services.ApplicationConfigurationInterface;
+import application.interfaces.ApplicationConfigurationInterface;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
