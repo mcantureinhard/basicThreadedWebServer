@@ -1,8 +1,11 @@
 package application.usecases;
 
+import application.ApplicationConfiguration;
 import application.services.RequestHandler;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,8 +22,12 @@ public class BasicWebServer<T extends RequestHandler> {
     private BlockingQueue<Socket> socketBlockingQueue;
     private ServerSocket serverSocket;
     private Thread threadedQueueConsumerThread;
+    private int timeout = 5000;
 
     private void init() throws IOException {
+        if(ApplicationConfiguration.getInstance().get("timeout") != null){
+            timeout = Integer.parseInt(ApplicationConfiguration.getInstance().get("timeout"));
+        }
         serverSocket = new ServerSocket(port);
         socketBlockingQueue = new ArrayBlockingQueue<>(maxQueueSize);
         threadedQueueConsumer = new ThreadedQueueConsumer(executorService, socketBlockingQueue, requestHandlerClass);
@@ -69,19 +76,16 @@ public class BasicWebServer<T extends RequestHandler> {
             while(true){
                 try {
                     Socket socket = socketBlockingQueue.take();
+                    socket.setSoTimeout(timeout);
                     System.out.println("Got socket from queue");
-                    RequestHandler handler = requestHandlerClass.getDeclaredConstructor(new Class[]{Socket.class}).newInstance(socket);
+                    RequestHandler handler = requestHandlerClass.getDeclaredConstructor(new Class[]{Socket.class, BlockingQueue.class}).newInstance(socket, socketBlockingQueue);
                     executorService.execute(handler);
-                } catch (InterruptedException e){
-                    System.out.println(e);
-                } catch (IllegalAccessException e){
-                    System.out.println(e);
-                } catch (NoSuchMethodException e){
-                    System.out.println(e);
-                } catch (InvocationTargetException e){
-                    System.out.println(e);
-                } catch (InstantiationException e){
-                    System.out.println(e);
+                } catch (Exception e){
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String error = sw.toString();
+                    System.out.println(error);
                 }
             }
         }

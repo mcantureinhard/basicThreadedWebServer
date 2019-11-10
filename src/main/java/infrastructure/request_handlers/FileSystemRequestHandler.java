@@ -7,14 +7,17 @@ import domain.models.SimpleHttpResponse;
 
 import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.util.Date;
 import java.util.StringTokenizer;
+import java.util.concurrent.BlockingQueue;
 
 public class FileSystemRequestHandler extends RequestHandler {
     //TODO Use configuration
     private final String rootDir = ApplicationConfiguration.getInstance().get("fsroot");
-    public FileSystemRequestHandler(Socket socket) {
-        super(socket);
+    public FileSystemRequestHandler(Socket socket, BlockingQueue<Socket> socketBlockingQueue) {
+        super(socket, socketBlockingQueue);
     }
 
     @Override
@@ -24,12 +27,13 @@ public class FileSystemRequestHandler extends RequestHandler {
         PrintWriter printWriter = null;
         BufferedOutputStream bufferedOutputStream = null;
         SimpleHttpResponse response = null;
+        SimpleHttpRequest request = null;
         String line = null;
         try {
             bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             printWriter = new PrintWriter(socket.getOutputStream());
             bufferedOutputStream = new BufferedOutputStream(socket.getOutputStream());
-            SimpleHttpRequest request = SimpleHttpRequest.fromBufferedReader(bufferedReader);
+            request = SimpleHttpRequest.fromBufferedReader(bufferedReader);
 
             switch (request.getMethod()){
                 case GET:
@@ -49,14 +53,31 @@ public class FileSystemRequestHandler extends RequestHandler {
         } finally {
             try {
                 sendResponse(response, printWriter, bufferedOutputStream);
-                if(bufferedReader != null){
-                    bufferedReader.close();
+                if(request == null || !request.getKeepAlive()) {
+                    if (bufferedReader != null) {
+                        bufferedReader.close();
+                    }
+                    if (printWriter != null) {
+                        printWriter.close();
+                    }
+                    if (bufferedOutputStream != null) {
+                        bufferedOutputStream.close();
+                    }
+                    socket.close();
+                } else {
+                    System.out.println(socketBlockingQueue.size());
+                    socketBlockingQueue.add(socket);
+                    System.out.println(socketBlockingQueue.size());
                 }
-                if(printWriter != null){
-                    printWriter.close();
-                }
-                if(bufferedOutputStream != null) {
-                    bufferedOutputStream.close();
+            } catch (SocketTimeoutException e){
+                try {
+                    socket.close();
+                } catch (Exception innerException){
+                    StringWriter sw = new StringWriter();
+                    PrintWriter pw = new PrintWriter(sw);
+                    e.printStackTrace(pw);
+                    String error = sw.toString();
+                    System.out.println(error);
                 }
             } catch (Exception e){
                 StringWriter sw = new StringWriter();
